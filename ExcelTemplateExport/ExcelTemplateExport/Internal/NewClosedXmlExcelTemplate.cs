@@ -1,5 +1,6 @@
 using System.Collections;
 using ClosedXML.Excel;
+using DocumentFormat.OpenXml.Office2010.ExcelAc;
 using ExcelTemplateExport.Utilities;
 
 namespace ExcelTemplateExport
@@ -16,18 +17,21 @@ namespace ExcelTemplateExport
 
             foreach (var sheet in workbook.Worksheets)
             {
+                var rows = new List<IXLRow>();
                 var outputSheet = outputWorkbook.Worksheets.Add(sheet.Name);
                 var rowsWithList = new List<Tuple<IXLRow, IEnumerable<object>>>();
                 foreach (var row in sheet.Rows())
                 {
-                    CopyRow(config, row, outputSheet, rowsWithList);
+                    rows.Add(NewRow(config, row, outputSheet, rowsWithList));
                 }
+
+                sheet.Row(rows);
             }
 
             outputWorkbook.SaveAs(GetOutputPath(config.OutputPath));
         }
 
-        private static void CopyRow(ExportConfiguration config, IXLRow row, IXLWorksheet outputSheet, List<Tuple<IXLRow, IEnumerable<object>>> rowsWithList)
+        private static IXLRow NewRow(ExportConfiguration config, IXLRow row, IXLWorksheet outputSheet, List<Tuple<IXLRow, IEnumerable<object>>> rowsWithList)
         {
             var listObject = IsListRow(row.Cells(), config);
             if (listObject != null)

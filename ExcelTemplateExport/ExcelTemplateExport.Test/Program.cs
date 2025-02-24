@@ -1,34 +1,34 @@
 ﻿using System.Diagnostics;
 using ExcelTemplateExport;
 
-var person = new MyClass { Name = "John", Age = 30, Amount = 1000 };
-var persons = new List<MyClass>();
+var person = new Person { Name = "John", Age = 30, Amount = 1000 };
+var persons = new List<Person>();
 
 for (var i= 0; i< 100000; i++)
 {
-    persons.Add(new MyClass { Name = $"Person {i}", Age = 30 + i, Amount = 1000 + i });
+    persons.Add(new Person { Name = $"Person {i}", Age = 30 + i, Amount = 1000 + i });
 }
 
 var config = new ExportConfiguration()
 {
-    TemplatePath = "/home/dulejo/Desktop/Template.xlsx",
+    TemplatePath = "/home/dulejo/Desktop/aaa.xlsx",
     FieldValues = new Dictionary<string, object>
     {
         { "Person", person },
-        { "Persons", persons }
+        { "Persons", persons },
+        { "HeaderName", "Neki Header" }
     },
     OutputPath = "/home/dulejo/Desktop/Output.xlsx"
 };
 
 var stopwatch = new Stopwatch();
 stopwatch.Start();
-var export = new ExcelTemplate();
-// export.ExportOpenXml(config);
+var export = new NewClosedXmlExcelTemplate();
 export.Export(config);
 stopwatch.Stop();
 Console.WriteLine($"Elapsed time: {stopwatch.ElapsedMilliseconds} ms");
 
-public class MyClass
+internal class Person
 {
     public string Name { get; set; }
 
