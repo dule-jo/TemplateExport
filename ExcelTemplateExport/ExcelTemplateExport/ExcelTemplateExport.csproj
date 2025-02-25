@@ -3,11 +3,17 @@
     <PropertyGroup>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <TargetFrameworks>net9.0;net6.0</TargetFrameworks>
+        <TargetFramework>net9.0</TargetFramework>
     </PropertyGroup>
 
     <ItemGroup>
       <PackageReference Include="ClosedXML" Version="0.105.0-rc" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="ClosedXML">
+        <HintPath>..\..\..\..\.nuget\packages\closedxml\0.105.0-rc\lib\netstandard2.1\ClosedXML.dll</HintPath>
+      </Reference>
     </ItemGroup>
 
 </Project>

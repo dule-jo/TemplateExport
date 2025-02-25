@@ -15,5 +15,9 @@ namespace ExcelTemplateExport
         public string TemplateStringEndsWith { get; set; } = "}}";
         
         public string TemplateStringSeparator { get; set; } = "::";
+
+        public bool PreserveRowHeight { get; set; } = false; // Extreamly slow for a large number of rows
+        
+        public bool PreserveColumnWidth { get; set; } = true; // Extreamly slow for a large number of columns
     }
 }
