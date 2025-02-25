@@ -8,7 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\ExcelTemplateExport\ExcelTemplateExport.csproj" />
+      <ProjectReference Include="..\TemplateExport.Excel\TemplateExport.Excel.csproj" />
     </ItemGroup>
 
 </Project>

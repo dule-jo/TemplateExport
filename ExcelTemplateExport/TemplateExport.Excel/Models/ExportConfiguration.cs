@@ -1,4 +1,4 @@
-namespace ExcelTemplateExport
+namespace ExcelTemplateExport.Models
 {
     public class ExportConfiguration
     {
@@ -19,5 +19,7 @@ namespace ExcelTemplateExport
         public bool PreserveRowHeight { get; set; } = false; // Extreamly slow for a large number of rows
         
         public bool PreserveColumnWidth { get; set; } = true; // Extreamly slow for a large number of columns
+
+        public bool PreserveMergeCells { get; set; } = true;
     }
 }

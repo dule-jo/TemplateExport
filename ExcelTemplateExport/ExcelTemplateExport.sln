@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExcelTemplateExport", "ExcelTemplateExport\ExcelTemplateExport.csproj", "{891893C3-5F07-4057-8D61-E97A3C146C35}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TemplateExport.Excel", "TemplateExport.Excel\TemplateExport.Excel.csproj", "{891893C3-5F07-4057-8D61-E97A3C146C35}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExcelTemplateExport.Test", "ExcelTemplateExport.Test\ExcelTemplateExport.Test.csproj", "{C9117BC0-7C08-4E47-8C89-0F6320A382A1}"
 EndProject

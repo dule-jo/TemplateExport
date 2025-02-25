@@ -1,3 +1,5 @@
+using ExcelTemplateExport.Models;
+
 namespace ExcelTemplateExport
 {
     public interface IExcelTemplateExport
