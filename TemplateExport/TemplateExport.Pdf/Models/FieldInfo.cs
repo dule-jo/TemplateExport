@@ -4,6 +4,7 @@ namespace TemplateExport.Pdf.Models
     {
         internal FieldInfo(string value, PdfExportConfiguration config)
         {
+            Value = value;
             if (!value.StartsWith(config.TemplateStringStartsWith) || !value.EndsWith(config.TemplateStringEndsWith)) return;
             
             value = value.Substring(config.TemplateStringStartsWith.Length, value.Length - config.TemplateStringStartsWith.Length - config.TemplateStringEndsWith.Length);
@@ -28,6 +29,8 @@ namespace TemplateExport.Pdf.Models
                 };
             }
         }
+        
+        internal string Value { get; set; }
         
         internal string ObjectName { get; set; }
 

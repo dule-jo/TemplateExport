@@ -13,4 +13,13 @@
       <ProjectReference Include="..\TemplateExport.Pdf\TemplateExport.Pdf.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Update="Resources\Test.xlsx">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Resources\test.html">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
 </Project>

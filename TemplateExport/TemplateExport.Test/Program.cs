@@ -1,9 +1,8 @@
 ﻿using System.Diagnostics;
-using System.Reflection;
-using TemplateExport.Excel;
-using TemplateExport.Excel.Internal;
-using TemplateExport.Excel.Models;
-using TemplateExport.Pdf.Internal;
+using ExcelTemplateExport.Internals;
+using ExcelTemplateExport.Models;
+using ExcelTemplateExport.Test;
+using TemplateExport.Pdf.Internals;
 using TemplateExport.Pdf.Models;
 
 var person = new Person { Name = "John", Age = 30, Amount = 1000 };
@@ -22,8 +21,8 @@ else
 void ExportPdf(Person person1, List<Person> list)
 {
     var config = PdfExportConfiguration.CreateBuilder()
-        .UseTemplatePath("./template.html")
-        .UseOutputPath("./output.html")
+        .UseTemplatePath("./Resources/test.html")
+        .UseOutputPath("./Resources/output.html")
         .AddDataSet("Person", person1)
         .AddDataSet("Persons", list)
         .Build();
@@ -39,8 +38,8 @@ void ExportPdf(Person person1, List<Person> list)
 void ExportExcel(Person person1, List<Person> list)
 {
     var config = ExcelExportConfiguration.CreateBuilder()
-        .UseTemplatePath("./template.xlsx")
-        .UseOutputPath("./output.xlsx")
+        .UseTemplatePath("./Resources/test.xlsx")
+        .UseOutputPath("./Resources/output.xlsx")
         .EnablePreserveMergeCells(false)
         .EnablePreserveRowHeight(false)
         .EnablePreserveColumnWidth(false)
@@ -57,13 +56,16 @@ void ExportExcel(Person person1, List<Person> list)
     Console.WriteLine($"Elapsed time: {stopwatch.ElapsedMilliseconds} ms");
 }
 
-public class Person
+namespace ExcelTemplateExport.Test
 {
-    public string Name { get; set; }
+    public class Person
+    {
+        public string Name { get; set; }
 
-    public int Age { get; set; }
+        public int Age { get; set; }
 
-    public double Amount { get; set; }
+        public double Amount { get; set; }
     
-    public double AmountPerYear => Amount / Age;
+        public double AmountPerYear => Amount / Age;
+    }
 }

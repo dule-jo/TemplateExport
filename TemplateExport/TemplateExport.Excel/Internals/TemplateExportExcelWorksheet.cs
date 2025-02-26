@@ -1,9 +1,9 @@
 using System.Collections;
 using ClosedXML.Excel;
-using TemplateExport.Excel.Utilities;
-using TemplateExport.Excel.Models;
+using ExcelTemplateExport.Models;
+using ExcelTemplateExport.Utilities;
 
-namespace TemplateExport.Excel.Internal
+namespace ExcelTemplateExport.Internals
 {
     internal class TemplateExportExcelWorksheet
     {

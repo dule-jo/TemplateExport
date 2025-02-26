@@ -1,6 +1,6 @@
-using TemplateExport.Excel.Models;
+using ExcelTemplateExport.Models;
 
-namespace TemplateExport.Excel.Utilities;
+namespace ExcelTemplateExport.Utilities;
 
 internal static class ListUtility
 {

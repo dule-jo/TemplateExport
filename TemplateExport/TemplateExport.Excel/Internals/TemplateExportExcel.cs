@@ -1,7 +1,7 @@
 using ClosedXML.Excel;
-using TemplateExport.Excel.Models;
+using ExcelTemplateExport.Models;
 
-namespace TemplateExport.Excel.Internal
+namespace ExcelTemplateExport.Internals
 {
     public class TemplateExportExcel : ITemplateExportExcel
     {
