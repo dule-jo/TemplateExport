@@ -1,4 +1,4 @@
-namespace ExcelTemplateExport.Models
+namespace TemplateExport.Excel.Models
 {
     internal class FieldInfo
     {

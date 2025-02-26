@@ -1,8 +1,8 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
-using ExcelTemplateExport;
-using ExcelTemplateExport.Internal;
-using ExcelTemplateExport.Models;
+using TemplateExport.Excel;
+using TemplateExport.Excel.Internal;
+using TemplateExport.Excel.Models;
 
 var person = new Person { Name = "John", Age = 30, Amount = 1000 };
 var persons = new List<Person>();

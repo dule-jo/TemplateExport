@@ -1,9 +1,9 @@
 using ClosedXML.Excel;
-using ExcelTemplateExport.Models;
+using TemplateExport.Excel.Models;
 
-namespace ExcelTemplateExport.Internal
+namespace TemplateExport.Excel.Internal
 {
-    public class TemplateExportExcel : IExcelTemplateExport
+    public class TemplateExportExcel : ITemplateExportExcel
     {
         public void Export(ExportConfiguration config)
         {
