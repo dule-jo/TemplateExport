@@ -5,7 +5,7 @@ namespace TemplateExport.Excel.Internal
 {
     public class TemplateExportExcel : ITemplateExportExcel
     {
-        public void Export(ExportConfiguration config)
+        public void Export(ExcelExportConfiguration config)
         {
             using var templateWb = new XLWorkbook(config.TemplatePath);
             using var outputWb = new XLWorkbook();

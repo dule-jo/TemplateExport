@@ -7,16 +7,16 @@ namespace TemplateExport.Excel.Internal
 {
     internal class TemplateExportExcelWorksheet
     {
-        private ExportConfiguration _config;
+        private ExcelExportConfiguration _config;
         private IXLStyle _defaultStyle = null;
         private int _rowsInserted = 0;
         private readonly List<object[]> _dataList = [];
-        private readonly Dictionary<(int row, int col), IXLStyle> _originalCellStyles = new Dictionary<(int row, int col), IXLStyle>();
-        private readonly Dictionary<(int row, int col), IXLStyle> _cellStyles = new Dictionary<(int row, int col), IXLStyle>();
-        private readonly Dictionary<(int row, int col), (int numOfRows, int numOfCols)> _originalMergedCells = new Dictionary<(int row, int col), (int numOfRows, int numOfCols)>();
-        private readonly Dictionary<(int row, int col), (int numOfRows, int numOfCols)> _mergedCells = new Dictionary<(int row, int col), (int numOfRows, int numOfCols)>();
+        private readonly Dictionary<(int row, int col), IXLStyle> _originalCellStyles = new();
+        private readonly Dictionary<(int row, int col), IXLStyle> _cellStyles = new();
+        private readonly Dictionary<(int row, int col), (int numOfRows, int numOfCols)> _originalMergedCells = new();
+        private readonly Dictionary<(int row, int col), (int numOfRows, int numOfCols)> _mergedCells = new();
 
-        internal void Export(ExportConfiguration config, IXLWorksheet templateSheet, IXLWorksheet outputSheet)
+        internal void Export(ExcelExportConfiguration config, IXLWorksheet templateSheet, IXLWorksheet outputSheet)
         {
             _config = config;
 
@@ -175,7 +175,7 @@ namespace TemplateExport.Excel.Internal
             }
         }
 
-        private void CopyRowHeight(ExportConfiguration config, IXLWorksheet templateSheet, IXLWorksheet outputSheet)
+        private void CopyRowHeight(ExcelExportConfiguration config, IXLWorksheet templateSheet, IXLWorksheet outputSheet)
         {
             if (!config.PreserveRowHeight) return;
             
@@ -188,7 +188,7 @@ namespace TemplateExport.Excel.Internal
             }
         }
 
-        private void CopyColumnWidth(ExportConfiguration config, int lastCol, IXLWorksheet templateSheet, IXLWorksheet outputSheet)
+        private void CopyColumnWidth(ExcelExportConfiguration config, int lastCol, IXLWorksheet templateSheet, IXLWorksheet outputSheet)
         {
             if (!config.PreserveColumnWidth) return;
             

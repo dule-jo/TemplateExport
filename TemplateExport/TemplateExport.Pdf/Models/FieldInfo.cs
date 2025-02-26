@@ -1,8 +1,8 @@
-namespace TemplateExport.Excel.Models
+namespace TemplateExport.Pdf.Models
 {
     internal class FieldInfo
     {
-        internal FieldInfo(string value, ExcelExportConfiguration config)
+        internal FieldInfo(string value, PdfExportConfiguration config)
         {
             if (!value.StartsWith(config.TemplateStringStartsWith) || !value.EndsWith(config.TemplateStringEndsWith)) return;
             

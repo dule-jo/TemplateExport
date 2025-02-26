@@ -1,8 +1,8 @@
-namespace TemplateExport.Excel.Models
+namespace TemplateExport.Pdf.Models
 {
-    public class ExportConfiguration
+    public class PdfExportConfiguration
     {
-        private ExportConfiguration() { }
+        private PdfExportConfiguration() { }
         
         internal string TemplatePath { get; set; }
 
@@ -17,6 +17,10 @@ namespace TemplateExport.Excel.Models
         internal string TemplateStringEndsWith { get; set; } = "}}";
         
         internal string TemplateStringSeparator { get; set; } = "::";
+        
+        internal string ForAttribute { get; set; } = "template-for";
+        
+        internal string IfAttribute { get; set; } = "template-if";
 
         internal bool PreserveRowHeight { get; set; } = true; // Can be slow for a large number of rows
         
@@ -34,9 +38,9 @@ namespace TemplateExport.Excel.Models
 
         public class Builder
         {
-            private readonly ExportConfiguration _config = new ExportConfiguration();
+            private readonly PdfExportConfiguration _config = new PdfExportConfiguration();
             
-            public ExportConfiguration Build() => _config;
+            public PdfExportConfiguration Build() => _config;
 
             /// <summary>
             /// Sets the path to the template file.

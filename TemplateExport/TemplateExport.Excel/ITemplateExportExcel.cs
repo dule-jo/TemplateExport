@@ -4,6 +4,6 @@ namespace TemplateExport.Excel
 {
     public interface ITemplateExportExcel
     {
-        public void Export(ExportConfiguration config);
+        public void Export(ExcelExportConfiguration config);
     }
 }
