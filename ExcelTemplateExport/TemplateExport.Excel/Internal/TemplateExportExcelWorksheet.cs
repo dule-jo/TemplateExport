@@ -8,6 +8,7 @@ namespace ExcelTemplateExport.Internal
     internal class TemplateExportExcelWorksheet
     {
         private ExportConfiguration _config;
+        private IXLStyle _defaultStyle = null;
         private int _rowsInserted = 0;
         private readonly List<object[]> _dataList = [];
         private readonly Dictionary<(int row, int col), IXLStyle> _originalCellStyles = new Dictionary<(int row, int col), IXLStyle>();
@@ -24,30 +25,31 @@ namespace ExcelTemplateExport.Internal
             var lastVisitedRow = 1;
             foreach (var row in templateSheet.Rows())
             {
-                var r = row.RowNumber();
-                for (var i = 0; i < r - lastVisitedRow - 1; i++)
+                var rowNumber = row.RowNumber();
+                for (var i = 0; i < rowNumber - lastVisitedRow - 1; i++)
                     _dataList.Add(new object[lastCol]);
-                lastVisitedRow = r;
+                lastVisitedRow = rowNumber;
                 var rowValues = new object[lastCol];
 
                 IEnumerable<object> listObject = null;
                 foreach (var cell in row.Cells())
                 {
                     if (cell.IsEmpty() || cell.DataType == XLDataType.Blank) continue;
-                    var c = cell.Address.ColumnNumber;
-                    _cellStyles[(r + _rowsInserted, c)] = cell.Style;
-                    if (cell.IsMerged() && cell.DataType != XLDataType.Blank) _mergedCells[(r + _rowsInserted, c)] = (cell.MergedRange().RowCount(), cell.MergedRange().ColumnCount());
+                    var columnNumber = cell.Address.ColumnNumber;
+                    
+                    if (config.PreserveCellStyles) SaveStyle(rowNumber, columnNumber, cell);
+                    if (config.PreserveMergeCells) SaveMergedCell(cell, rowNumber, columnNumber);
                                        
                     var text = GetTextInside(cell);
                     var fieldInfo = new FieldInfo(text, _config);
                     if (!TryGetType(fieldInfo, out var obj, out var type)) 
                     {
-                        rowValues[c - 1] = text;
+                        rowValues[columnNumber - 1] = text;
                         continue;
                     }
                     if (fieldInfo.Aggregation != null)
                     {
-                        rowValues[c - 1] = (obj as IEnumerable<object>).GetAggregationValue(fieldInfo);
+                        rowValues[columnNumber - 1] = (obj as IEnumerable<object>).GetAggregationValue(fieldInfo);
                     }
                     else if (typeof(IEnumerable).IsAssignableFrom(type) && type != typeof(string))
                     {
@@ -55,7 +57,7 @@ namespace ExcelTemplateExport.Internal
                         if (list == null) continue;
 
                         listObject = list;
-                        rowValues[c - 1] = text;
+                        rowValues[columnNumber - 1] = text;
                     }
                     else
                     {
@@ -63,7 +65,7 @@ namespace ExcelTemplateExport.Internal
                         if (property == null) continue;
 
                         var newValue = type.GetProperty(fieldInfo.PropertyName)?.GetValue(obj);
-                        rowValues[c - 1] = newValue;
+                        rowValues[columnNumber - 1] = newValue;
                     }
                 }
                 if (listObject == null)
@@ -72,7 +74,7 @@ namespace ExcelTemplateExport.Internal
                 }
                 else
                 {
-                    CopyList(listObject, rowValues, templateSheet, r);
+                    CopyList(listObject, rowValues, templateSheet, rowNumber);
                 }
             }
 
@@ -85,6 +87,17 @@ namespace ExcelTemplateExport.Internal
             CopyRowHeight(config, templateSheet, outputSheet);
 
             CopyColumnWidth(config, lastCol, templateSheet, outputSheet);
+        }
+
+        private void SaveMergedCell(IXLCell cell, int r, int c)
+        {
+            if (cell.IsMerged() && cell.DataType != XLDataType.Blank) 
+                _mergedCells[(r + _rowsInserted, c)] = (cell.MergedRange().RowCount(), cell.MergedRange().ColumnCount());
+        }
+
+        private void SaveStyle(int r, int c, IXLCell cell)
+        {
+            _cellStyles[(r + _rowsInserted, c)] = cell.Style;
         }
 
         private void CopyList(IEnumerable<object> listObject, object[] rowValues, IXLWorksheet templateSheet, int r)

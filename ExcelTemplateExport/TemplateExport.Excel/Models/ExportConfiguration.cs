@@ -43,7 +43,7 @@ namespace ExcelTemplateExport.Models
             /// </summary>
             /// <param name="templatePath"></param>
             /// <returns></returns>
-            public Builder WithTemplatePath(string templatePath)
+            public Builder UseTemplatePath(string templatePath)
             {
                 _config.TemplatePath = templatePath;
                 return this;
@@ -54,7 +54,7 @@ namespace ExcelTemplateExport.Models
             /// </summary>
             /// <param name="outputPath"></param>
             /// <returns></returns>
-            public Builder WithOutputPath(string outputPath)
+            public Builder UseOutputPath(string outputPath)
             {
                 _config.OutputPath = outputPath;
                 return this;
@@ -65,7 +65,7 @@ namespace ExcelTemplateExport.Models
             /// </summary>
             /// <param name="outputStream"></param>
             /// <returns></returns>
-            public Builder WithOutputStream(Stream outputStream)
+            public Builder UseOutputStream(Stream outputStream)
             {
                 _config.OutputStream = outputStream;
                 return this;
@@ -76,7 +76,7 @@ namespace ExcelTemplateExport.Models
             /// </summary>
             /// <param name="templateStringStartsWith">Default is "{{"</param>
             /// <returns></returns>
-            public Builder WithTemplateStringStartsWith(string templateStringStartsWith)
+            public Builder UseTemplateStringStartsWith(string templateStringStartsWith)
             {
                 _config.TemplateStringStartsWith = templateStringStartsWith;
                 return this;
@@ -87,7 +87,7 @@ namespace ExcelTemplateExport.Models
             /// </summary>
             /// <param name="templateStringEndsWith">Default is "}}"</param>
             /// <returns></returns>
-            public Builder WithTemplateStringEndsWith(string templateStringEndsWith)
+            public Builder UseTemplateStringEndsWith(string templateStringEndsWith)
             {
                 _config.TemplateStringEndsWith = templateStringEndsWith;
                 return this;
@@ -98,7 +98,7 @@ namespace ExcelTemplateExport.Models
             /// </summary>
             /// <param name="templateStringSeparator">Default is "::"</param>
             /// <returns></returns>
-            public Builder WithTemplateStringSeparator(string templateStringSeparator)
+            public Builder UseTemplateStringSeparator(string templateStringSeparator)
             {
                 _config.TemplateStringSeparator = templateStringSeparator;
                 return this;
@@ -110,7 +110,7 @@ namespace ExcelTemplateExport.Models
             /// </summary>
             /// <param name="preserveRowHeight"> Default is true.</param>
             /// <returns></returns>
-            public Builder SetPreserveRowHeight(bool preserveRowHeight)
+            public Builder EnablePreserveRowHeight(bool preserveRowHeight)
             {
                 _config.PreserveRowHeight = preserveRowHeight;
                 if (!preserveRowHeight) _config.AutoFitRows = false;
@@ -122,7 +122,7 @@ namespace ExcelTemplateExport.Models
             /// </summary>
             /// <param name="preserveColumnWidth">Default is true</param>
             /// <returns></returns>
-            public Builder SetPreserveColumnWidth(bool preserveColumnWidth)
+            public Builder EnablePreserveColumnWidth(bool preserveColumnWidth)
             {
                 _config.PreserveColumnWidth = preserveColumnWidth;
                 if (!preserveColumnWidth) _config.AutoFitColumns = false;
@@ -134,7 +134,7 @@ namespace ExcelTemplateExport.Models
             /// </summary>
             /// <param name="preserveMergeCells">Default is true</param>
             /// <returns></returns>
-            public Builder SetPreserveMergeCells(bool preserveMergeCells)
+            public Builder EnablePreserveMergeCells(bool preserveMergeCells)
             {
                 _config.PreserveMergeCells = preserveMergeCells;
                 return this;
@@ -145,7 +145,7 @@ namespace ExcelTemplateExport.Models
             /// </summary>
             /// <param name="preserveCellStyles">Default is true</param>
             /// <returns></returns>
-            public Builder SetPreserveCellStyles(bool preserveCellStyles)
+            public Builder EnablePreserveCellStyles(bool preserveCellStyles)
             {
                 _config.PreserveCellStyles = preserveCellStyles;
                 return this;
@@ -157,7 +157,7 @@ namespace ExcelTemplateExport.Models
             /// </summary>
             /// <param name="autoFitColumns">Default is false.</param>
             /// <returns></returns>
-            public Builder SetAutoFitColumns(bool autoFitColumns)
+            public Builder EnableAutoFitColumns(bool autoFitColumns)
             {
                 _config.AutoFitColumns = autoFitColumns;
                 if (autoFitColumns) _config.PreserveColumnWidth = false;
@@ -170,7 +170,7 @@ namespace ExcelTemplateExport.Models
             /// </summary>
             /// <param name="autoFitRows"></param>
             /// <returns></returns>
-            public Builder SetAutoFitRows(bool autoFitRows)
+            public Builder EnableAutoFitRows(bool autoFitRows)
             {
                 _config.AutoFitRows = autoFitRows;
                 if (autoFitRows) _config.PreserveRowHeight = false;

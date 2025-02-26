@@ -13,10 +13,12 @@ for (var i= 0; i< 100000; i++)
 }
 
 var config = ExportConfiguration.CreateBuilder()
-    .WithTemplatePath("./template.xlsx")
-    .WithOutputPath("./output.xlsx")
-    .SetAutoFitRows(true)
-    .SetAutoFitColumns(true)
+    .UseTemplatePath("./template.xlsx")
+    .UseOutputPath("./output.xlsx")
+    .EnablePreserveMergeCells(false)
+    .EnablePreserveRowHeight(false)
+    .EnablePreserveColumnWidth(false)
+    .EnablePreserveCellStyles(true)
     .AddDataSet("Person", person)
     .AddDataSet("Persons", persons)
     .Build();
