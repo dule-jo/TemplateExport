@@ -5,7 +5,7 @@ using ExcelTemplateExport.Utilities;
 
 namespace ExcelTemplateExport.Internal
 {
-    public class TemplateExportExcelWorksheet
+    internal class TemplateExportExcelWorksheet
     {
         private ExportConfiguration _config;
         private int _rowsInserted = 0;
@@ -15,7 +15,7 @@ namespace ExcelTemplateExport.Internal
         private readonly Dictionary<(int row, int col), (int numOfRows, int numOfCols)> _originalMergedCells = new Dictionary<(int row, int col), (int numOfRows, int numOfCols)>();
         private readonly Dictionary<(int row, int col), (int numOfRows, int numOfCols)> _mergedCells = new Dictionary<(int row, int col), (int numOfRows, int numOfCols)>();
 
-        public void Export(ExportConfiguration config, IXLWorksheet templateSheet, IXLWorksheet outputSheet)
+        internal void Export(ExportConfiguration config, IXLWorksheet templateSheet, IXLWorksheet outputSheet)
         {
             _config = config;
 
@@ -130,6 +130,8 @@ namespace ExcelTemplateExport.Internal
 
         private void MergeCells(IXLWorksheet outputSheet)
         {
+            if (!_config.PreserveMergeCells) return;
+            
             foreach (var mergedCell in _mergedCells)
             {
                 var startCell = outputSheet.Cell(mergedCell.Key.row, mergedCell.Key.col);
@@ -141,6 +143,8 @@ namespace ExcelTemplateExport.Internal
 
         private void CopyCellsStyle(IXLWorksheet outputSheet)
         {
+            if (!_config.PreserveCellStyles) return;
+            
             foreach (var key in _cellStyles.Keys)
             {
                 if (!_cellStyles.TryGetValue((key.row, key.col), out var style)) continue;
@@ -184,7 +188,11 @@ namespace ExcelTemplateExport.Internal
             }
         }
 
-        private string GetTextInside(IXLCell cell) { return cell.IsEmpty() ? string.Empty : cell.GetText(); }
+        private static string GetTextInside(IXLCell cell)
+        {
+            if (cell.HasFormula) throw new Exception("Export does not support cells with formulas");
+            return cell.IsEmpty() ? string.Empty : cell.GetText();
+        }
 
         private bool TryGetType(FieldInfo fieldInfo, out object? obj, out Type? type)
         {
@@ -195,7 +203,7 @@ namespace ExcelTemplateExport.Internal
                 return false;
             }
                 
-            if (!_config.FieldValues.TryGetValue(fieldInfo.ObjectName, out obj))
+            if (!_config.DataSets.TryGetValue(fieldInfo.ObjectName, out obj))
             {
                 type = null;
                 return false;

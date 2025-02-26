@@ -2,9 +2,9 @@ using ExcelTemplateExport.Models;
 
 namespace ExcelTemplateExport.Utilities;
 
-public static class ListUtility
+internal static class ListUtility
 {
-    public static double? GetAggregationValue(this IEnumerable<object> list, FieldInfo fieldInfo)
+    internal static double? GetAggregationValue(this IEnumerable<object> list, FieldInfo fieldInfo)
     {
         if (fieldInfo.Aggregation == null || list == null) return null;
 

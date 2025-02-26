@@ -1,8 +1,8 @@
 namespace ExcelTemplateExport.Models
 {
-    public class FieldInfo
+    internal class FieldInfo
     {
-        public FieldInfo(string value, ExportConfiguration config)
+        internal FieldInfo(string value, ExportConfiguration config)
         {
             if (!value.StartsWith(config.TemplateStringStartsWith) || !value.EndsWith(config.TemplateStringEndsWith)) return;
             
@@ -29,13 +29,13 @@ namespace ExcelTemplateExport.Models
             }
         }
         
-        public string ObjectName { get; set; }
+        internal string ObjectName { get; set; }
 
-        public string PropertyName { get; set; }
+        internal string PropertyName { get; set; }
 
-        public AggregationType? Aggregation { get; set; }
+        internal AggregationType? Aggregation { get; set; }
         
-        public enum AggregationType
+        internal enum AggregationType
         {
             Sum,
             Average,

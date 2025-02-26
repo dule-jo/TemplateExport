@@ -16,7 +16,10 @@ namespace ExcelTemplateExport.Internal
                 new TemplateExportExcelWorksheet().Export(config, worksheet, outputSheet);
             }
 
-            outputWb.SaveAs(config.OutputPath);
+            if (config.OutputStream != null)
+                outputWb.SaveAs(config.OutputStream);
+            else if (!string.IsNullOrEmpty(config.OutputPath)) outputWb.SaveAs(config.OutputPath);
+            else throw new ArgumentNullException("OutputPath or OutputStream must be set");
         }
     }
 }
