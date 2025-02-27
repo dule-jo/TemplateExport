@@ -5,7 +5,7 @@ using ExcelTemplateExport.Test;
 using TemplateExport.Pdf.Internals;
 using TemplateExport.Pdf.Models;
 
-var person = new Person { Name = "John", Age = 30, Amount = 1000 };
+var person = new Person { Name = "John", Age = 29, Amount = 1000 };
 var persons = new List<Person>();
 
 for (var i= 0; i< 3; i++)
@@ -67,5 +67,7 @@ namespace ExcelTemplateExport.Test
         public double Amount { get; set; }
     
         public double AmountPerYear => Amount / Age;
+        
+        public bool IsOld => Age > 31;
     }
 }

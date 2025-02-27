@@ -22,7 +22,7 @@ public class TemplateExportPdf : ITemplateExportPdf
 
     private void TraverseNode(HtmlNode node, Dictionary<string, object> dataSetsForList = null)
     {
-        if (ReplaceIf(node)) return;
+        if (ReplaceIf(node, dataSetsForList)) return;
 
         foreach (var childNode in node.ChildNodes.ToList())
         {
@@ -41,22 +41,67 @@ public class TemplateExportPdf : ITemplateExportPdf
         }
     }
 
-    private bool ReplaceIf(HtmlNode node)
+    private bool ReplaceIf(HtmlNode node, Dictionary<string, object> dataSetsForList)
     {
-        if (node.Attributes.Any(x => x.Name == _config.IfAttribute))
+        if (node.Attributes.All(x => x.Name != _config.IfAttribute)) return false;
+
+        var nodeAttribute = node.Attributes[_config.IfAttribute];
+        var ifAttributeValue = nodeAttribute.Value;
+
+        nodeAttribute.Remove();
+
+        var fieldInfo = new FieldInfo(ifAttributeValue, _config);
+
+        if (!TryGetType(fieldInfo, dataSetsForList, out var obj, out var type) || typeof(IEnumerable).IsAssignableFrom(type) && type != typeof(string))
+        {
+            RemoveNode(node);
+            return true;
+        }
+
+        if (fieldInfo.Aggregation != null)
+        {
+            RemoveNode(node);
+            return true;
+        }
+
+        var property = type.GetProperty(fieldInfo.PropertyName);
+        if (property == null)
+        {
+            RemoveNode(node);
+            return true;
+        }
+
+        if (!GetBoolValue(type.GetProperty(fieldInfo.PropertyName)?.GetValue(obj)))
         {
             node.Remove();
             return true;
         }
-
+        
         return false;
+    }
+
+    private void RemoveNode(HtmlNode removeNodes)
+    {
+        removeNodes.Remove();
+    }
+
+    private static bool GetBoolValue(object? getValue)
+    {
+        return getValue switch
+        {
+            bool b => b,
+            int i => i != 0,
+            double d => d != 0,
+            string s => !string.IsNullOrEmpty(s),
+            _ => false
+        };
     }
 
     private void ReplaceInnerHtml(HtmlNode node, FieldInfo fieldInfo, Dictionary<string, object> dataSetsForList)
     {
         object newValue2 = string.Empty;
         if (!TryGetType(fieldInfo, dataSetsForList, out var obj, out var type) || typeof(IEnumerable).IsAssignableFrom(type) && type != typeof(string)) return;
-        
+
         if (fieldInfo.Aggregation != null)
         {
             newValue2 = (obj as IEnumerable<object>).GetAggregationValue(fieldInfo);
