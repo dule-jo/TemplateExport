@@ -6,6 +6,10 @@ namespace TemplateExport.Pdf.Models
         
         internal string TemplatePath { get; set; }
 
+        internal string[] TemplateHead { get; set; } = [];
+        
+        internal string[] TemplateBody { get; set; } = [];
+
         internal Dictionary<string, object> DataSets { get; } = new();
 
         internal string OutputPath { get; set; }
@@ -50,6 +54,29 @@ namespace TemplateExport.Pdf.Models
             public Builder UseTemplatePath(string templatePath)
             {
                 _config.TemplatePath = templatePath;
+                return this;
+            }
+            
+            /// <summary>
+            /// Adds a template head to the configuration. Heads are added to html file in the order they are called.
+            /// Content of file must be valid html element
+            /// </summary>
+            /// <param name="templateHead">Path to template file that contains part or whole head</param>
+            /// <returns></returns>
+            public Builder UseTemplateHead(string templateHead)
+            {
+                _config.TemplateHead = _config.TemplateHead.Append(templateHead).ToArray();
+                return this;
+            }
+            
+            /// <summary>
+            /// Adds a template body to the configuration. Bodies are added to html file in the order they are called.
+            /// </summary>
+            /// <param name="templateBody">Path to template file that contains part or whole header</param>
+            /// <returns></returns>
+            public Builder UseTemplateBody(string templateBody)
+            {
+                _config.TemplateBody = _config.TemplateBody.Append(templateBody).ToArray();
                 return this;
             }
             

@@ -8,15 +8,16 @@ using TemplateExport.Pdf.Models;
 var person = new Person { Name = "John", Age = 29, Amount = 1000 };
 var persons = new List<Person>();
 
-for (var i= 0; i< 3; i++)
+for (var i = 0; i < 3; i++)
 {
     persons.Add(new Person { Name = $"Person {i}", Age = 30 + i, Amount = 1000 + i });
 }
 
 if (false)
     ExportExcel(person, persons);
-else 
+else if (false)
     ExportPdf(person, persons);
+else ExportPdf2(person, persons);
 
 void ExportPdf(Person person1, List<Person> list)
 {
@@ -26,9 +27,29 @@ void ExportPdf(Person person1, List<Person> list)
         .AddDataSet("Person", person1)
         .AddDataSet("Persons", list)
         .Build();
-    
+
     var stopwatch = new Stopwatch();
-    stopwatch.Start();  
+    stopwatch.Start();
+    var export = new TemplateExportPdf();
+    export.Export(config);
+    stopwatch.Stop();
+    Console.WriteLine($"Elapsed time: {stopwatch.ElapsedMilliseconds} ms");
+}
+
+void ExportPdf2(Person person1, List<Person> list)
+{
+    var config = PdfExportConfiguration.CreateBuilder()
+        .UseTemplateHead("./Resources/head1.html")
+        .UseTemplateHead("./Resources/head2.html")
+        .UseTemplateBody("./Resources/body1.html")
+        .UseTemplateBody("./Resources/body2.html")
+        .UseOutputPath("./Resources/headbody.html")
+        .AddDataSet("Person", person1)
+        .AddDataSet("Persons", list)
+        .Build();
+
+    var stopwatch = new Stopwatch();
+    stopwatch.Start();
     var export = new TemplateExportPdf();
     export.Export(config);
     stopwatch.Stop();
@@ -49,7 +70,7 @@ void ExportExcel(Person person1, List<Person> list)
         .Build();
 
     var stopwatch = new Stopwatch();
-    stopwatch.Start();  
+    stopwatch.Start();
     var export = new TemplateExportExcel();
     export.Export(config);
     stopwatch.Stop();
@@ -65,9 +86,9 @@ namespace ExcelTemplateExport.Test
         public int Age { get; set; }
 
         public double Amount { get; set; }
-    
+
         public double AmountPerYear => Amount / Age;
-        
+
         public bool IsOld => Age > 31;
     }
 }

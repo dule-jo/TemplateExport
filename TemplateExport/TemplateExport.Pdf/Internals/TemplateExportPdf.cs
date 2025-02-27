@@ -12,12 +12,54 @@ public class TemplateExportPdf : ITemplateExportPdf
     public void Export(PdfExportConfiguration config)
     {
         _config = config;
-        var templateHtml = new HtmlDocument();
-        templateHtml.Load(_config.TemplatePath);
+        var templateHtml = GetTemplateHtml();
 
         TraverseNode(templateHtml.DocumentNode);
 
         templateHtml.Save(_config.OutputPath);
+    }
+
+    private HtmlDocument GetTemplateHtml()
+    {
+        var templateHtml = new HtmlDocument();
+        
+        if (_config.TemplatePath == null) return LoadHtmlFromHeadAndBody();
+        
+        templateHtml.Load(_config.TemplatePath);
+        return templateHtml;
+
+    }
+
+    private  HtmlDocument LoadHtmlFromHeadAndBody()
+    {
+        var doc = new HtmlDocument();
+        doc.LoadHtml("<html><head></head><body></body></html>");
+        
+        var header = doc.DocumentNode.SelectSingleNode("//head");
+        foreach (var headFile in _config.TemplateHead)
+        {
+            var headDoc = new HtmlDocument();
+            headDoc.Load(headFile);
+            
+            foreach (var headNode in headDoc.DocumentNode.ChildNodes)
+            {
+                header.AppendChild(headNode);
+            }
+        }
+
+        var body = doc.DocumentNode.SelectSingleNode("//body");
+        foreach (var bodyFile in _config.TemplateBody)
+        {
+            var bodyDoc = new HtmlDocument();
+            bodyDoc.Load(bodyFile);
+            
+            foreach (var bodyNode in bodyDoc.DocumentNode.ChildNodes)
+            {
+                body.AppendChild(bodyNode);
+            }
+        }
+
+        return doc;
     }
 
     private void TraverseNode(HtmlNode node, Dictionary<string, object> dataSetsForList = null)
@@ -76,7 +118,6 @@ public class TemplateExportPdf : ITemplateExportPdf
             node.Remove();
             return true;
         }
-        
         return false;
     }
 
