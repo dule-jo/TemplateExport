@@ -8,7 +8,7 @@ using TemplateExport.Pdf.Models;
 var person = new Person { Name = "John", Age = 30, Amount = 1000 };
 var persons = new List<Person>();
 
-for (var i= 0; i< 10; i++)
+for (var i= 0; i< 3; i++)
 {
     persons.Add(new Person { Name = $"Person {i}", Age = 30 + i, Amount = 1000 + i });
 }
