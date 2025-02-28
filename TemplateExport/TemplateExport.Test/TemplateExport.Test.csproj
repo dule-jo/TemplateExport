@@ -34,4 +34,10 @@
       </None>
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="itext7" Version="9.1.0" />
+      <PackageReference Include="itext7.bouncy-castle-adapter" Version="9.1.0" />
+      <PackageReference Include="itext7.pdfhtml" Version="6.1.0" />
+    </ItemGroup>
+
 </Project>

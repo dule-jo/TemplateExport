@@ -43,7 +43,7 @@ void ExportPdf2(Person person1, List<Person> list)
         .UseTemplateHead("./Resources/head2.html")
         .UseTemplateBody("./Resources/body1.html")
         .UseTemplateBody("./Resources/body2.html")
-        .UseOutputPath("./Resources/headbody.html")
+        .UseOutputPath("./Resources/headbody.pdf")
         .AddDataSet("Person", person1)
         .AddDataSet("Persons", list)
         .Build();

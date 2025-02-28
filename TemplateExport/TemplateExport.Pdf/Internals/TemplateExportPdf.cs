@@ -1,5 +1,6 @@
 using System.Collections;
 using HtmlAgilityPack;
+using iText.Html2pdf;
 using TemplateExport.Pdf.Models;
 using TemplateExport.Pdf.Utilities;
 
@@ -16,7 +17,15 @@ public class TemplateExportPdf : ITemplateExportPdf
 
         TraverseNode(templateHtml.DocumentNode);
 
-        templateHtml.Save(_config.OutputPath);
+        try
+        {
+            if (_config.OutputPath != null) ConvertHtmlToPdfFile(templateHtml.DocumentNode.OuterHtml, _config.OutputPath);
+            else if (_config.OutputStream != null) HtmlConverter.ConvertToPdf(templateHtml.DocumentNode.OuterHtml, _config.OutputStream);
+            else throw new Exception("OutputPath or OutputStream must be set.");
+        } catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
     }
 
     private HtmlDocument GetTemplateHtml()
@@ -158,29 +167,6 @@ public class TemplateExportPdf : ITemplateExportPdf
         node.InnerHtml = node.InnerHtml.Replace(fieldInfo.Value, newValue2.ToString());
     }
 
-    private static void RemoveNodes(List<HtmlNode> removeNodes)
-    {
-        foreach (var removeNode in removeNodes)
-        {
-            removeNode.Remove();
-        }
-    }
-
-    private static void ReplaceListNodes(List<Tuple<HtmlNode, List<HtmlNode>>> insertAfterNodes)
-    {
-        foreach (var (deleteNode, newNodes) in insertAfterNodes)
-        {
-            var parent = deleteNode.ParentNode;
-
-            foreach (var obj in newNodes)
-            {
-                parent.InsertAfter(obj, deleteNode);
-            }
-
-            deleteNode.Remove();
-        }
-    }
-
     private void ReplaceWithList(HtmlNode childNode)
     {
         var setName = childNode.GetAttributeValue(_config.ForAttribute, "");
@@ -231,5 +217,11 @@ public class TemplateExportPdf : ITemplateExportPdf
 
         type = obj?.GetType() ?? typeof(string);
         return true;
+    }
+
+    private static void ConvertHtmlToPdfFile(string html, string outputPath)
+    {
+        using var stream = new FileStream(outputPath, FileMode.Create);
+        HtmlConverter.ConvertToPdf(html, stream);
     }
 }
