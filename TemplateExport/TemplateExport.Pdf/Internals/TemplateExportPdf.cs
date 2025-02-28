@@ -1,10 +1,7 @@
 using System.Collections;
 using HtmlAgilityPack;
-using PdfSharp;
-using PdfSharp.Pdf;
 using TemplateExport.Pdf.Models;
 using TemplateExport.Pdf.Utilities;
-using TheArtOfDev.HtmlRenderer.PdfSharp;
 
 namespace TemplateExport.Pdf.Internals;
 
@@ -19,40 +16,31 @@ public class TemplateExportPdf : ITemplateExportPdf
 
         TraverseNode(templateHtml.DocumentNode);
 
-        var pdf = PdfGenerator.GeneratePdf(templateHtml.DocumentNode.OuterHtml, PageSize.A4);
-        
-        if (_config.OutputStream != null)
-        {
-            pdf.Save(_config.OutputStream);
-        }
-        else if (!string.IsNullOrEmpty(_config.OutputPath))
-        {
-            pdf.Save(_config.OutputPath);
-        }
-        else throw new ArgumentNullException("OutputPath or OutputStream must be set");
+        templateHtml.Save(_config.OutputPath);
     }
 
     private HtmlDocument GetTemplateHtml()
     {
         var templateHtml = new HtmlDocument();
-
+        
         if (_config.TemplatePath == null) return LoadHtmlFromHeadAndBody();
-
+        
         templateHtml.Load(_config.TemplatePath);
         return templateHtml;
+
     }
 
-    private HtmlDocument LoadHtmlFromHeadAndBody()
+    private  HtmlDocument LoadHtmlFromHeadAndBody()
     {
         var doc = new HtmlDocument();
         doc.LoadHtml("<html><head></head><body></body></html>");
-
+        
         var header = doc.DocumentNode.SelectSingleNode("//head");
         foreach (var headFile in _config.TemplateHead)
         {
             var headDoc = new HtmlDocument();
             headDoc.Load(headFile);
-
+            
             foreach (var headNode in headDoc.DocumentNode.ChildNodes)
             {
                 header.AppendChild(headNode);
@@ -64,7 +52,7 @@ public class TemplateExportPdf : ITemplateExportPdf
         {
             var bodyDoc = new HtmlDocument();
             bodyDoc.Load(bodyFile);
-
+            
             foreach (var bodyNode in bodyDoc.DocumentNode.ChildNodes)
             {
                 body.AppendChild(bodyNode);
@@ -130,7 +118,6 @@ public class TemplateExportPdf : ITemplateExportPdf
             node.Remove();
             return true;
         }
-
         return false;
     }
 
