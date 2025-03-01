@@ -5,19 +5,19 @@ using ExcelTemplateExport.Test;
 using TemplateExport.Pdf.Internals;
 using TemplateExport.Pdf.Models;
 
-var person = new Person { Name = "John", Age = 29, Amount = 1000 };
-var persons = new List<Person>();
+var person = new Person { Name = "John", Age = 122, Amount = 1000 };
+var people = new List<Person>();
 
 for (var i = 0; i < 3; i++)
 {
-    persons.Add(new Person { Name = $"Person {i}", Age = 30 + i, Amount = 1000 + i });
+    people.Add(new Person { Name = $"Person {i}", Age = 30 + i, Amount = 1000 + i });
 }
 
 if (false)
-    ExportExcel(person, persons);
+    ExportExcel(person, people);
 else if (false)
-    ExportPdf(person, persons);
-else ExportPdf2(person, persons);
+    ExportPdf(person, people);
+else ExportPdf2(person, people);
 
 void ExportPdf(Person person1, List<Person> list)
 {
@@ -25,7 +25,7 @@ void ExportPdf(Person person1, List<Person> list)
         .UseTemplatePath("./Resources/test.html")
         .UseOutputPath("./Resources/output.html")
         .AddDataSet("Person", person1)
-        .AddDataSet("Persons", list)
+        .AddDataSet("People", list)
         .Build();
 
     var stopwatch = new Stopwatch();
@@ -45,7 +45,7 @@ void ExportPdf2(Person person1, List<Person> list)
         .UseTemplateBody("./Resources/body2.html")
         .UseOutputPath("./Resources/headbody.pdf")
         .AddDataSet("Person", person1)
-        .AddDataSet("Persons", list)
+        .AddDataSet("People", list)
         .Build();
 
     var stopwatch = new Stopwatch();
@@ -66,7 +66,7 @@ void ExportExcel(Person person1, List<Person> list)
         .EnablePreserveColumnWidth(false)
         .EnablePreserveCellStyles(true)
         .AddDataSet("Person", person1)
-        .AddDataSet("Persons", list)
+        .AddDataSet("People", list)
         .Build();
 
     var stopwatch = new Stopwatch();

@@ -16,40 +16,39 @@ public class TemplateExportPdf : ITemplateExportPdf
         var templateHtml = GetTemplateHtml();
 
         TraverseNode(templateHtml.DocumentNode);
+        
+        SaveToOutput(templateHtml);
+    }
 
-        try
-        {
-            if (_config.OutputPath != null) ConvertHtmlToPdfFile(templateHtml.DocumentNode.OuterHtml, _config.OutputPath);
-            else if (_config.OutputStream != null) HtmlConverter.ConvertToPdf(templateHtml.DocumentNode.OuterHtml, _config.OutputStream);
-            else throw new Exception("OutputPath or OutputStream must be set.");
-        } catch (Exception e)
-        {
-            Console.WriteLine(e);
-        }
+    private void SaveToOutput(HtmlDocument templateHtml)
+    {
+        if (_config.OutputPath != null) ConvertHtmlToPdfFile(templateHtml.DocumentNode.OuterHtml, _config.OutputPath);
+        else if (_config.OutputStream != null) HtmlConverter.ConvertToPdf(templateHtml.DocumentNode.OuterHtml, _config.OutputStream);
+        else throw new Exception("OutputPath or OutputStream must be set.");
     }
 
     private HtmlDocument GetTemplateHtml()
     {
         var templateHtml = new HtmlDocument();
-        
+
         if (_config.TemplatePath == null) return LoadHtmlFromHeadAndBody();
-        
+
         templateHtml.Load(_config.TemplatePath);
         return templateHtml;
 
     }
 
-    private  HtmlDocument LoadHtmlFromHeadAndBody()
+    private HtmlDocument LoadHtmlFromHeadAndBody()
     {
         var doc = new HtmlDocument();
         doc.LoadHtml("<html><head></head><body></body></html>");
-        
+
         var header = doc.DocumentNode.SelectSingleNode("//head");
         foreach (var headFile in _config.TemplateHead)
         {
             var headDoc = new HtmlDocument();
             headDoc.Load(headFile);
-            
+
             foreach (var headNode in headDoc.DocumentNode.ChildNodes)
             {
                 header.AppendChild(headNode);
@@ -61,7 +60,7 @@ public class TemplateExportPdf : ITemplateExportPdf
         {
             var bodyDoc = new HtmlDocument();
             bodyDoc.Load(bodyFile);
-            
+
             foreach (var bodyNode in bodyDoc.DocumentNode.ChildNodes)
             {
                 body.AppendChild(bodyNode);
@@ -74,6 +73,7 @@ public class TemplateExportPdf : ITemplateExportPdf
     private void TraverseNode(HtmlNode node, Dictionary<string, object> dataSetsForList = null)
     {
         if (ReplaceIf(node, dataSetsForList)) return;
+        if (ReplaceElse(node)) return;
 
         foreach (var childNode in node.ChildNodes.ToList())
         {
@@ -92,6 +92,13 @@ public class TemplateExportPdf : ITemplateExportPdf
         }
     }
 
+    private bool ReplaceElse(HtmlNode node)
+    {
+        if (node.Attributes.All(x => x.Name != _config.ElseAttribute)) return false;
+        node.Remove();
+        return true;
+    }
+
     private bool ReplaceIf(HtmlNode node, Dictionary<string, object> dataSetsForList)
     {
         if (node.Attributes.All(x => x.Name != _config.IfAttribute)) return false;
@@ -103,36 +110,38 @@ public class TemplateExportPdf : ITemplateExportPdf
 
         var fieldInfo = new FieldInfo(ifAttributeValue, _config);
 
-        if (!TryGetType(fieldInfo, dataSetsForList, out var obj, out var type) || typeof(IEnumerable).IsAssignableFrom(type) && type != typeof(string))
-        {
-            RemoveNode(node);
-            return true;
-        }
+        if (!TryGetType(fieldInfo, dataSetsForList, out var obj, out var type) || typeof(IEnumerable).IsAssignableFrom(type) && type != typeof(string)) return false;
 
-        if (fieldInfo.Aggregation != null)
-        {
-            RemoveNode(node);
-            return true;
-        }
+        if (fieldInfo.Aggregation != null) return false;
 
         var property = type.GetProperty(fieldInfo.PropertyName);
-        if (property == null)
-        {
-            RemoveNode(node);
-            return true;
-        }
+        if (property == null) return false;
 
-        if (!GetBoolValue(type.GetProperty(fieldInfo.PropertyName)?.GetValue(obj)))
-        {
-            node.Remove();
-            return true;
-        }
-        return false;
+        if (GetBoolValue(type.GetProperty(fieldInfo.PropertyName)?.GetValue(obj))) return false;
+
+        return IfRemove(node);
     }
 
-    private void RemoveNode(HtmlNode removeNodes)
+    private bool IfRemove(HtmlNode node)
     {
-        removeNodes.Remove();
+        var nextNode = GetNextRealSibling(node);
+        if (nextNode != null)
+        {
+            var elseAttribute = nextNode.Attributes.Any(x => x.Name == _config.ElseAttribute) ? nextNode.Attributes[_config.ElseAttribute] : null;
+            elseAttribute?.Remove();
+        }
+        node.Remove();
+        return true;
+    }
+
+    private static HtmlNode GetNextRealSibling(HtmlNode node)
+    {
+        var nextSibling = node.NextSibling;
+        while (nextSibling != null && nextSibling.NodeType != HtmlNodeType.Element)
+        {
+            nextSibling = nextSibling.NextSibling;
+        }
+        return nextSibling;
     }
 
     private static bool GetBoolValue(object? getValue)
@@ -189,10 +198,7 @@ public class TemplateExportPdf : ITemplateExportPdf
         childNode.Remove();
     }
 
-    private static HtmlNode CreateNewNode(HtmlNode childNode, object o, string setName)
-    {
-        return HtmlNode.CreateNode(childNode.OuterHtml);
-    }
+    private static HtmlNode CreateNewNode(HtmlNode childNode, object o, string setName) { return HtmlNode.CreateNode(childNode.OuterHtml); }
 
     private bool TryGetType(FieldInfo fieldInfo, Dictionary<string, object> dataSetsForList, out object? obj, out Type? type)
     {

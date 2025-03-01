@@ -1,3 +1,5 @@
+using iText.Kernel.Geom;
+
 namespace TemplateExport.Pdf.Models
 {
     public class PdfExportConfiguration
@@ -25,6 +27,8 @@ namespace TemplateExport.Pdf.Models
         internal string ForAttribute { get; set; } = "template-for";
         
         internal string IfAttribute { get; set; } = "template-if";
+        
+        internal string ElseAttribute { get; set; } = "template-else";
 
         internal bool PreserveRowHeight { get; set; } = true; // Can be slow for a large number of rows
         
@@ -37,6 +41,10 @@ namespace TemplateExport.Pdf.Models
         internal bool AutoFitColumns { get; set; }
         
         internal bool AutoFitRows { get; set; }
+        
+        internal PageSize PageSize { get; set; } = PageSize.A4;
+        
+        internal PageOrientation PageOrientation { get; set; } = PageOrientation.Portrait;
         
         public static Builder CreateBuilder() => new();
 
@@ -217,6 +225,28 @@ namespace TemplateExport.Pdf.Models
             public Builder AddDataSet(string key, object value)
             {
                 _config.DataSets.Add(key, value);
+                return this;
+            }
+            
+            /// <summary>
+            /// Sets the page size for the output.
+            /// </summary>
+            /// <param name="pageSize">Default is A4</param>
+            /// <returns></returns>
+            public Builder SetPageSize(PageSize pageSize)
+            {
+                _config.PageSize = pageSize;
+                return this;
+            }
+            
+            /// <summary>
+            /// Sets the page orientation for the output.
+            /// </summary>
+            /// <param name="pageOrientation">Default is Portrait</param>
+            /// <returns></returns>
+            public Builder SetPageOrientation(PageOrientation pageOrientation)
+            {
+                _config.PageOrientation = pageOrientation;
                 return this;
             }
             

@@ -1,3 +1,6 @@
-<div>
-    Age: {{Person::Age}}
+<div template-if="{{Person::IsOld}}" style="color: red">
+    Old: {{Person::Age}} 
+</div>
+<div template-else style="color: green">
+    Young: {{Person::Age}}
 </div>
