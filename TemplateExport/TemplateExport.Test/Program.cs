@@ -24,9 +24,9 @@ for (var i = 0; i < 3; i++)
     people.Add(new Person { Name = $"Person {i}", Age = 30 + i, Amount = 1000 + i });
 }
 
-    // ExportExcel(person, people, excelExport);
-    ExportPdf(person, people, pdfExport);
-    // ExportPdf2(person, people, pdfExport);
+ExportExcel(person, people, excelExport);
+// ExportPdf(person, people, pdfExport);
+// ExportPdf2(person, people, pdfExport);
 
 void ExportPdf(Person person1, List<Person> list, ITemplateExportPdf templateExportPdf)
 {
@@ -78,12 +78,12 @@ void ExportExcel(Person person, List<Person> list, ITemplateExportExcel template
     var config = ExcelExportConfiguration.CreateBuilder()
         .UseTemplatePath("./Resources/test.xlsx")
         .UseOutputPath("./Resources/output.xlsx")
-        .EnablePreserveMergeCells(false)
-        .EnablePreserveRowHeight(false)
-        .EnablePreserveColumnWidth(false)
+        .EnablePreserveMergeCells(true)
+        .EnablePreserveRowHeight(true)
+        .EnablePreserveColumnWidth(true)
         .EnablePreserveCellStyles(true)
         .AddDataSet("Person", person)
-        .AddDataSet("People", list)
+        .AddDataSet("Persons", list)
         .Build();
     
     templateExportExcel.Export(config);

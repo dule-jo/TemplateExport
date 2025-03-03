@@ -1,4 +1,5 @@
 
+
 # TemplateExport
 
 TemplateExport is a library for exporting PDF documents using HTML templates and exporting Excel documents using Xlsx templates. It allows you to define templates with placeholders and dynamically replace them with data.
@@ -83,6 +84,28 @@ Resolve the `ITemplateExportPdf` service and call the `Export` method:
 ```csharp
 var pdfExport = serviceProvider.GetService<ITemplateExportPdf>();
 pdfExport.Export(config);
+```
+
+### 5. Configuration options
+
+``` csharp
+
+UseTemplateStringStartsWith("{{") // set placeholders starts with string (Default: "{{")
+
+UseTemplateStringEndsWith("}}") // set placeholders starts with string (Default: "}}")
+
+UseTemplateStringSeparator("::") // set placeholders separator string (Default: "::")
+
+UseOutputStream(stream) // set output stream for pdf
+
+UseOutputPath(path) // set output path for pdf
+
+AddDataSet("Person", new Person { Name = "John", Age = 30 }) // add data set to configuration
+
+SetPageOrientation(PageOrientation.Landscape) // set page orientation (Default: Portrait)
+
+SetPageSize(PageSize.A3) // set page size (Default: A4)
+
 ```
 
 ### Example
@@ -170,7 +193,7 @@ services.AddTemplateExportExcel();
 var serviceProvider = services.BuildServiceProvider();
 ```
 
-### 2. Create excel template on given location 
+### 2. Create excel template on given location
 
 Create template xlsx file on location provided to configuration builder
 [template-example.xlsx](./TemplateExport/TemplateExport.Test/Resources/test.xlsx)
@@ -196,6 +219,34 @@ Resolve the `ITemplateExportExcel` service and call the `Export` method:
 ```csharp
 var excelExport = serviceProvider.GetService<ITemplateExportExcel>();
 excelExport.Export(config);
+```
+
+### 5. Configuration options
+
+``` csharp
+
+UseOutputStream(stream) // set output stream for excel
+
+UseTemplateStringStartsWith("{{") // set placeholders starts with string (Default: "{{")
+
+UseTemplateStringEndsWith("}}") // set placeholders starts with string (Default: "}}")
+
+UseTemplateStringSeparator("::") // set placeholders separator string (Default: "::")
+
+EnablePreserveRowHeight(false) // preserve row height of template file. Can be very slow for a lot of rows (Default: true)
+
+EnablePreserveColumnWidth(false) // preserve column width of template file. Can be very slow for a lot of columns (Default: true)
+
+EnablePreserveMergeCells(false) // preserve merge cells of template file. Can be very slow for a lot of merge cells (Default: true)
+
+EnablePreserveCellStyles(false) // preserve cell styles of template file. Can be very slow for a lot of cells (Default: true)
+
+EnableAutoFitColumns(true) // auto fit columns after export. Cannot be true if PreserveColumnWidth is enabled (Default: false)
+
+EnableAutoFitRows(true) // auto fit rows after export. Cannot be true if PreserveRowHeight is enabled (Default: false)
+
+AddDataSet("Person", new Person { Name = "John", Age = 30 }) // add data set to configuration
+
 ```
 
 ### Example
@@ -253,4 +304,3 @@ This project is licensed under the MIT License. See the `LICENSE` file for more 
 ## License
 
 This project is licensed under the MIT License. See the `LICENSE` file for more details.
-
