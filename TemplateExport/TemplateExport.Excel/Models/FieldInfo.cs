@@ -4,6 +4,7 @@ namespace ExcelTemplateExport.Models
     {
         internal FieldInfo(string value, ExcelExportConfiguration config)
         {
+            if (value == null) return;
             if (!value.StartsWith(config.TemplateStringStartsWith) || !value.EndsWith(config.TemplateStringEndsWith)) return;
             
             value = value.Substring(config.TemplateStringStartsWith.Length, value.Length - config.TemplateStringStartsWith.Length - config.TemplateStringEndsWith.Length);

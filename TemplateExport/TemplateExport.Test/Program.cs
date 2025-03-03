@@ -1,9 +1,20 @@
 ﻿using System.Diagnostics;
-using ExcelTemplateExport.Internals;
+using ExcelTemplateExport;
+using ExcelTemplateExport.Extensions;
 using ExcelTemplateExport.Models;
 using ExcelTemplateExport.Test;
-using TemplateExport.Pdf.Internals;
+using iText.Kernel.Geom;
+using Microsoft.Extensions.DependencyInjection;
+using TemplateExport.Pdf;
+using TemplateExport.Pdf.Extensions;
 using TemplateExport.Pdf.Models;
+
+var services = new ServiceCollection();
+services.AddTemplateExportExcel();
+services.AddTemplateExportPdf();
+var serviceProvider = services.BuildServiceProvider();
+var excelExport = serviceProvider.GetService<ITemplateExportExcel>();
+var pdfExport = serviceProvider.GetService<ITemplateExportPdf>();
 
 var person = new Person { Name = "John", Age = 122, Amount = 1000 };
 var people = new List<Person>();
@@ -13,51 +24,57 @@ for (var i = 0; i < 3; i++)
     people.Add(new Person { Name = $"Person {i}", Age = 30 + i, Amount = 1000 + i });
 }
 
-if (false)
-    ExportExcel(person, people);
-else if (false)
-    ExportPdf(person, people);
-else ExportPdf2(person, people);
+    // ExportExcel(person, people, excelExport);
+    ExportPdf(person, people, pdfExport);
+    // ExportPdf2(person, people, pdfExport);
 
-void ExportPdf(Person person1, List<Person> list)
+void ExportPdf(Person person1, List<Person> list, ITemplateExportPdf templateExportPdf)
 {
+    var stopwatch = new Stopwatch();
+    stopwatch.Start();
+    
     var config = PdfExportConfiguration.CreateBuilder()
         .UseTemplatePath("./Resources/test.html")
-        .UseOutputPath("./Resources/output.html")
+        .UseOutputPath("./Resources/output.pdf")
         .AddDataSet("Person", person1)
         .AddDataSet("People", list)
         .Build();
-
-    var stopwatch = new Stopwatch();
-    stopwatch.Start();
-    var export = new TemplateExportPdf();
-    export.Export(config);
+    
+    templateExportPdf.Export(config);
     stopwatch.Stop();
+    
     Console.WriteLine($"Elapsed time: {stopwatch.ElapsedMilliseconds} ms");
 }
 
-void ExportPdf2(Person person1, List<Person> list)
+void ExportPdf2(Person person1, List<Person> list, ITemplateExportPdf templateExportPdf)
 {
+
+    var stopwatch = new Stopwatch();
+    stopwatch.Start();
+    
     var config = PdfExportConfiguration.CreateBuilder()
         .UseTemplateHead("./Resources/head1.html")
         .UseTemplateHead("./Resources/head2.html")
         .UseTemplateBody("./Resources/body1.html")
         .UseTemplateBody("./Resources/body2.html")
         .UseOutputPath("./Resources/headbody.pdf")
+        .SetPageOrientation(PageOrientation.Landscape)
+        .SetPageSize(PageSize.A3)
         .AddDataSet("Person", person1)
         .AddDataSet("People", list)
         .Build();
-
-    var stopwatch = new Stopwatch();
-    stopwatch.Start();
-    var export = new TemplateExportPdf();
-    export.Export(config);
+    
+    templateExportPdf.Export(config);
     stopwatch.Stop();
+    
     Console.WriteLine($"Elapsed time: {stopwatch.ElapsedMilliseconds} ms");
 }
 
-void ExportExcel(Person person1, List<Person> list)
+void ExportExcel(Person person, List<Person> list, ITemplateExportExcel templateExportExcel)
 {
+    var stopwatch = new Stopwatch();
+    stopwatch.Start();
+    
     var config = ExcelExportConfiguration.CreateBuilder()
         .UseTemplatePath("./Resources/test.xlsx")
         .UseOutputPath("./Resources/output.xlsx")
@@ -65,15 +82,13 @@ void ExportExcel(Person person1, List<Person> list)
         .EnablePreserveRowHeight(false)
         .EnablePreserveColumnWidth(false)
         .EnablePreserveCellStyles(true)
-        .AddDataSet("Person", person1)
+        .AddDataSet("Person", person)
         .AddDataSet("People", list)
         .Build();
-
-    var stopwatch = new Stopwatch();
-    stopwatch.Start();
-    var export = new TemplateExportExcel();
-    export.Export(config);
+    
+    templateExportExcel.Export(config);
     stopwatch.Stop();
+    
     Console.WriteLine($"Elapsed time: {stopwatch.ElapsedMilliseconds} ms");
 }
 

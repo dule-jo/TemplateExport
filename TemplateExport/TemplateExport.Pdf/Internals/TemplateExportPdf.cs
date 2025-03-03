@@ -6,7 +6,7 @@ using TemplateExport.Pdf.Utilities;
 
 namespace TemplateExport.Pdf.Internals;
 
-public class TemplateExportPdf : ITemplateExportPdf
+internal class TemplateExportPdf : ITemplateExportPdf
 {
     private PdfExportConfiguration _config;
 
@@ -77,7 +77,7 @@ public class TemplateExportPdf : ITemplateExportPdf
 
         foreach (var childNode in node.ChildNodes.ToList())
         {
-            TraverseNode(childNode);
+            TraverseNode(childNode, dataSetsForList);
         }
 
         if (node.Attributes.Any(x => x.Name == _config.ForAttribute)) ReplaceWithList(node);
@@ -179,9 +179,10 @@ public class TemplateExportPdf : ITemplateExportPdf
     private void ReplaceWithList(HtmlNode childNode)
     {
         var setName = childNode.GetAttributeValue(_config.ForAttribute, "");
-        if (!_config.DataSets.TryGetValue(setName, out var list)) return;
-        var type = list?.GetType() ?? typeof(string);
-
+        
+        var fieldInfo = new FieldInfo(setName, _config);
+        if (!TryGetType(fieldInfo, null, out var list, out var type)) return;
+        
         childNode.Attributes.Remove(_config.ForAttribute);
 
         if (typeof(IEnumerable).IsAssignableFrom(type) && type != typeof(string))
@@ -189,9 +190,9 @@ public class TemplateExportPdf : ITemplateExportPdf
             var i = 0;
             foreach (var obj in list as IEnumerable<object>)
             {
-                var htmlNode = CreateNewNode(childNode, obj, setName);
+                var htmlNode = CreateNewNode(childNode, obj, fieldInfo.ObjectName);
                 childNode.ParentNode.InsertAfter(htmlNode, childNode);
-                TraverseNode(htmlNode, new Dictionary<string, object> { { setName, obj } });
+                TraverseNode(htmlNode, new Dictionary<string, object> { { fieldInfo.ObjectName, obj } });
             }
         }
 

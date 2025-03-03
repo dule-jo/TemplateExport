@@ -3,7 +3,7 @@ using ExcelTemplateExport.Models;
 
 namespace ExcelTemplateExport.Internals
 {
-    public class TemplateExportExcel : ITemplateExportExcel
+    internal class TemplateExportExcel : ITemplateExportExcel
     {
         public void Export(ExcelExportConfiguration config)
         {
