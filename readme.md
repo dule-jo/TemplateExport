@@ -1,3 +1,4 @@
+
 # TemplateExport.Pdf
 
 TemplateExport.Pdf is a library for exporting PDF documents using HTML templates. It allows you to define templates with placeholders and dynamically replace them with data.
@@ -33,7 +34,33 @@ services.AddTemplateExportPdf();
 var serviceProvider = services.BuildServiceProvider();
 ```
 
-### 2. Create a PDF Export Configuration
+### 2. Add html template on given location
+
+Create html template on given location
+
+```html
+<html>
+	<div template-if="{{Person::IsOld}}">
+		<div template-if="{{Person::IsOld}}" style="color: red">  
+		  Old: {{Person::Age}}   
+		</div>  
+		<div template-else style="color: green">  
+		  Young: {{Person::Age}}  
+		</div>
+	</div>
+	<div template-for="{{People}}">
+		<div style="color:blue">
+			{{People::Name}}
+		</div>
+		<div style="color:gray">
+			{{People::Age}}
+		</div>
+	</div>
+</html>
+
+```
+
+### 3. Create a PDF Export Configuration
 
 Create a configuration for exporting a PDF document:
 
@@ -47,7 +74,7 @@ var config = PdfExportConfiguration.CreateBuilder()
     .Build();
 ```
 
-### 3. Export the PDF
+### 4. Export the PDF
 
 Resolve the `ITemplateExportPdf` service and call the `Export` method:
 
@@ -86,7 +113,9 @@ var config = PdfExportConfiguration.CreateBuilder()
     .UseTemplatePath("./Resources/template.html")
     .UseOutputPath("./Resources/output.pdf")
     .AddDataSet("Person", person)
-    .AddDataSet("People", people)
+    .AddDataSet("People", people)  
+	.SetPageOrientation(PageOrientation.Landscape)  
+	.SetPageSize(PageSize.A3)
     .Build();
 
 var stopwatch = new Stopwatch();
