@@ -10,7 +10,7 @@ namespace ExcelTemplateExport.Internals
         private ExcelExportConfiguration _config;
         private IXLStyle _defaultStyle = null;
         private int _rowsInserted = 0;
-        private readonly List<object[]> _dataList = [];
+        private readonly List<object[]> _dataList = new List<object[]>();
         private readonly Dictionary<(int row, int col), IXLStyle> _originalCellStyles = new();
         private readonly Dictionary<(int row, int col), IXLStyle> _cellStyles = new();
         private readonly Dictionary<(int row, int col), (int numOfRows, int numOfCols)> _originalMergedCells = new();

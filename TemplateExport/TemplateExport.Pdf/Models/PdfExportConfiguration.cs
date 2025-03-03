@@ -8,9 +8,9 @@ namespace TemplateExport.Pdf.Models
         
         internal string TemplatePath { get; set; }
 
-        internal string[] TemplateHead { get; set; } = [];
+        internal string[] TemplateHead { get; set; } = Array.Empty<string>();
         
-        internal string[] TemplateBody { get; set; } = [];
+        internal string[] TemplateBody { get; set; } = Array.Empty<string>();
 
         internal Dictionary<string, object> DataSets { get; } = new();
 
