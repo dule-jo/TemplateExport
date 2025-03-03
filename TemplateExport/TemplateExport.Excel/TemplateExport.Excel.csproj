@@ -8,18 +8,21 @@
         <Title>Excel template export</Title>
         <Description>Create xlsx report using template. Replace placeholders with data. Support list objects.</Description>
         <TargetFrameworks>net9.0;net6.0;net7.0;net8.0</TargetFrameworks>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <Authors>dule-jo</Authors>
     </PropertyGroup>
 
     <ItemGroup>
       <PackageReference Include="ClosedXML" Version="0.105.0-rc" />
-      <PackageReference Include="itext7" Version="9.1.0" />
-      <PackageReference Include="itext7.bouncy-castle-adapter" Version="9.1.0" />
-      <PackageReference Include="itext7.pdfhtml" Version="6.1.0" />
     </ItemGroup>
 
     <ItemGroup>
       <Reference Include="ClosedXML">
         <HintPath>..\..\..\..\.nuget\packages\closedxml\0.105.0-rc\lib\netstandard2.1\ClosedXML.dll</HintPath>
+      </Reference>
+      <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions">
+        <HintPath>..\..\..\..\.nuget\packages\microsoft.extensions.dependencyinjection.abstractions\5.0.0\lib\netstandard2.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
       </Reference>
     </ItemGroup>
 
