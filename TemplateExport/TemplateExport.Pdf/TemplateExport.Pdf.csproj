@@ -10,6 +10,7 @@
         <Description>Create pdf report using template. Replace placeholders with data. Support list objects.</Description>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
+        <Authors>dule-jo</Authors>
     </PropertyGroup>
 
     <ItemGroup>
