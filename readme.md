@@ -173,7 +173,7 @@ var serviceProvider = services.BuildServiceProvider();
 ### 2. Create excel template on given location 
 
 Create template xlsx file on location provided to configuration builder
-[template-example.xlsx](./TemplateExport/TemplateExport.Test/Resources)
+[template-example.xlsx](./TemplateExport/TemplateExport.Test/Resources/test.xlsx)
 
 ### 3. Create an Excel Export Configuration
 
