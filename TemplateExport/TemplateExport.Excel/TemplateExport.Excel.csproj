@@ -14,16 +14,17 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="ClosedXML" Version="0.105.0-rc" />
+        <PackageReference Include="ClosedXML" Version="0.105.0-rc"/>
     </ItemGroup>
 
     <ItemGroup>
-      <Reference Include="ClosedXML">
-        <HintPath>..\..\..\..\.nuget\packages\closedxml\0.105.0-rc\lib\netstandard2.1\ClosedXML.dll</HintPath>
-      </Reference>
-      <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions">
-        <HintPath>..\..\..\..\.nuget\packages\microsoft.extensions.dependencyinjection.abstractions\5.0.0\lib\netstandard2.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
-      </Reference>
+        <Reference Include="ClosedXML">
+            <HintPath>..\..\..\..\.nuget\packages\closedxml\0.105.0-rc\lib\netstandard2.1\ClosedXML.dll</HintPath>
+        </Reference>
+        <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions">
+            <HintPath>..\..\..\..\.nuget\packages\microsoft.extensions.dependencyinjection.abstractions\5.0.0\lib\netstandard2.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
+        </Reference>
+        <None Include="README.md" Pack="true" PackagePath="\"/>
     </ItemGroup>
 
 </Project>
