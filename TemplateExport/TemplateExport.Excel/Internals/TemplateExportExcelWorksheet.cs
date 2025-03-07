@@ -10,7 +10,7 @@ namespace ExcelTemplateExport.Internals
         private ExcelExportConfiguration _config;
         private IXLStyle _defaultStyle = null;
         private int _rowsInserted = 0;
-        private readonly List<object[]> _dataList = new List<object[]>();
+        private readonly List<object[]> _dataList = new();
         private readonly Dictionary<(int row, int col), IXLStyle> _originalCellStyles = new();
         private readonly Dictionary<(int row, int col), IXLStyle> _cellStyles = new();
         private readonly Dictionary<(int row, int col), (int numOfRows, int numOfCols)> _originalMergedCells = new();
@@ -25,56 +25,29 @@ namespace ExcelTemplateExport.Internals
             var lastVisitedRow = 1;
             foreach (var row in templateSheet.Rows())
             {
-                var rowNumber = row.RowNumber();
-                for (var i = 0; i < rowNumber - lastVisitedRow - 1; i++)
-                    _dataList.Add(new object[lastCol]);
-                lastVisitedRow = rowNumber;
+                AddSkippedRowsToDataSet(row, lastVisitedRow, lastCol);
+                
+                lastVisitedRow = row.RowNumber();
                 var rowValues = new object[lastCol];
-
                 IEnumerable<object> listObject = null;
+                
                 foreach (var cell in row.Cells())
                 {
                     if (cell.IsEmpty() || cell.DataType == XLDataType.Blank) continue;
-                    var columnNumber = cell.Address.ColumnNumber;
                     
-                    if (config.PreserveCellStyles) SaveStyle(rowNumber, columnNumber, cell);
-                    if (config.PreserveMergeCells) SaveMergedCell(cell, rowNumber, columnNumber);
+                    if (config.PreserveCellStyles) SaveStyle(row.RowNumber(), cell.Address.ColumnNumber, cell);
+                    if (config.PreserveMergeCells) SaveMergedCell(cell, row.RowNumber(), cell.Address.ColumnNumber);
                                        
-                    var text = GetTextInside(cell);
-                    var fieldInfo = new FieldInfo(text, _config);
-                    if (!TryGetType(fieldInfo, out var obj, out var type)) 
-                    {
-                        rowValues[columnNumber - 1] = text;
-                        continue;
-                    }
-                    if (fieldInfo.Aggregation != null)
-                    {
-                        rowValues[columnNumber - 1] = (obj as IEnumerable<object>).GetAggregationValue(fieldInfo);
-                    }
-                    else if (typeof(IEnumerable).IsAssignableFrom(type) && type != typeof(string))
-                    {
-                        var list = obj as IEnumerable<object>;
-                        if (list == null) continue;
-
-                        listObject = list;
-                        rowValues[columnNumber - 1] = text;
-                    }
-                    else
-                    {
-                        var property = type.GetProperty(fieldInfo.PropertyName);
-                        if (property == null) continue;
-
-                        var newValue = type.GetProperty(fieldInfo.PropertyName)?.GetValue(obj);
-                        rowValues[columnNumber - 1] = newValue;
-                    }
+                    AddValueToData(cell, rowValues, ref listObject);
                 }
+                
                 if (listObject == null)
                 {
                     _dataList.Add(rowValues);
                 }
                 else
                 {
-                    CopyList(listObject, rowValues, templateSheet, rowNumber);
+                    CopyList(listObject, rowValues, templateSheet, row.RowNumber());
                 }
             }
 
@@ -84,9 +57,52 @@ namespace ExcelTemplateExport.Internals
 
             CopyCellsStyle(outputSheet);
 
-            CopyRowHeight(config, templateSheet, outputSheet);
+            SetRowHeight(config, templateSheet, outputSheet);
 
-            CopyColumnWidth(config, lastCol, templateSheet, outputSheet);
+            SetColumnWidth(config, lastCol, templateSheet, outputSheet);
+        }
+
+        private void AddValueToData(IXLCell cell, object[] rowValues, ref IEnumerable<object>? listObject)
+        {
+            var text = GetTextInside(cell);
+            var fieldInfo = new FieldInfo(text, _config);
+            if (!TryGetType(fieldInfo, out var obj, out var type))
+            {
+                rowValues[cell.Address.ColumnNumber - 1] = text;
+                return;
+            }
+            if (fieldInfo.Aggregation != null)
+            {
+                rowValues[cell.Address.ColumnNumber - 1] = (obj as IEnumerable<object>).GetAggregationValue(fieldInfo);
+            }
+            else if (typeof(IEnumerable).IsAssignableFrom(type) && type != typeof(string))
+            {
+                var list = obj as IEnumerable<object>;
+                if (list == null) return;
+
+                listObject = list;
+                rowValues[cell.Address.ColumnNumber - 1] = text;
+            }
+            else
+            {
+                var newValue = obj;
+
+                if (fieldInfo.PropertyName != null)
+                {
+                    var property = type.GetProperty(fieldInfo.PropertyName);
+                    if (property == null) return;
+
+                    newValue = type.GetProperty(fieldInfo.PropertyName)?.GetValue(obj);
+                }
+
+                rowValues[cell.Address.ColumnNumber - 1] = newValue;
+            }
+        }
+
+        private void AddSkippedRowsToDataSet(IXLRow row, int lastVisitedRow, int lastCol)
+        {
+            for (var i = 0; i < row.RowNumber() - lastVisitedRow - 1; i++)
+                _dataList.Add(new object[lastCol]);
         }
 
         private void SaveMergedCell(IXLCell cell, int r, int c)
@@ -102,6 +118,7 @@ namespace ExcelTemplateExport.Internals
 
         private void CopyList(IEnumerable<object> listObject, object[] rowValues, IXLWorksheet templateSheet, int r)
         {
+            var i = 0;
             foreach (var member in listObject)
             {
                 _rowsInserted++;
@@ -110,7 +127,7 @@ namespace ExcelTemplateExport.Internals
                 var index = 0;
                 foreach (var value in copy)
                 {
-                    if (member == listObject.FirstOrDefault())
+                    if (i == 0)
                     {
                         var cell = templateSheet.Cell(r, index + 1);
                         if (cell.IsMerged())
@@ -120,7 +137,7 @@ namespace ExcelTemplateExport.Internals
                         }
                         _originalCellStyles[(r, index + 1)] = cell.Style;
                     }
-                    else
+                    
                     {
                         _cellStyles[(r + _rowsInserted - 1, index + 1)] = _originalCellStyles[(r, index + 1)];
 
@@ -129,6 +146,7 @@ namespace ExcelTemplateExport.Internals
                             _mergedCells[(r + _rowsInserted - 1, index + 1)] = _originalMergedCells[(r, index + 1)];
                         }
                     }
+                    
                     var fieldInfo = new FieldInfo(value?.ToString(), _config);
                     if (fieldInfo.ObjectName == null) continue;
                     var property = member.GetType().GetProperty(fieldInfo.PropertyName);
@@ -138,6 +156,7 @@ namespace ExcelTemplateExport.Internals
 
                 _dataList.Add(copy);
             }
+            i++;
             _rowsInserted--; // to compensate for row in template
         }
 
@@ -175,8 +194,9 @@ namespace ExcelTemplateExport.Internals
             }
         }
 
-        private void CopyRowHeight(ExcelExportConfiguration config, IXLWorksheet templateSheet, IXLWorksheet outputSheet)
+        private void SetRowHeight(ExcelExportConfiguration config, IXLWorksheet templateSheet, IXLWorksheet outputSheet)
         {
+            if (config.AutoFitRows) outputSheet.Rows().AdjustToContents();
             if (!config.PreserveRowHeight) return;
             
             foreach (var r in _cellStyles.Keys.Select(x => x.row).Distinct())
@@ -188,8 +208,9 @@ namespace ExcelTemplateExport.Internals
             }
         }
 
-        private void CopyColumnWidth(ExcelExportConfiguration config, int lastCol, IXLWorksheet templateSheet, IXLWorksheet outputSheet)
+        private void SetColumnWidth(ExcelExportConfiguration config, int lastCol, IXLWorksheet templateSheet, IXLWorksheet outputSheet)
         {
+            if (config.AutoFitColumns) outputSheet.Columns().AdjustToContents();
             if (!config.PreserveColumnWidth) return;
             
             for (var c = 1; c <= lastCol; c++)

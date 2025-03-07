@@ -35,7 +35,6 @@ internal class TemplateExportPdf : ITemplateExportPdf
 
         templateHtml.Load(_config.TemplatePath);
         return templateHtml;
-
     }
 
     private HtmlDocument LoadHtmlFromHeadAndBody()
