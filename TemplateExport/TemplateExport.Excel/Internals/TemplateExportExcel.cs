@@ -1,4 +1,5 @@
 using ClosedXML.Excel;
+using ClosedXML.Graphics;
 using ExcelTemplateExport.Models;
 
 namespace ExcelTemplateExport.Internals
@@ -7,6 +8,8 @@ namespace ExcelTemplateExport.Internals
     {
         public void Export(ExcelExportConfiguration config)
         {
+            LoadOptions.DefaultGraphicEngine = new DefaultGraphicEngine("Arial");
+            
             using var templateWb = new XLWorkbook(config.TemplatePath);
             using var outputWb = new XLWorkbook();
 
