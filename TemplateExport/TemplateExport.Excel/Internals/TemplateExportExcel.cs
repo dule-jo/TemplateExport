@@ -47,37 +47,42 @@ namespace ExcelTemplateExport.Internals
             templateWb.SaveAs(templateStream);
             outputWb.SaveAs(outputStream);
 
-            using (var templateDoc = SpreadsheetDocument.Open(templateStream, false))
-            using (var outputDoc = SpreadsheetDocument.Open(outputStream, true))
+            using var templateDoc = SpreadsheetDocument.Open(templateStream, false);
+            using var outputDoc = SpreadsheetDocument.Open(outputStream, true);
+            
+            var templateWorkbookPart = templateDoc.WorkbookPart;
+            var outputWorkbookPart = outputDoc.WorkbookPart;
+
+            foreach (var templateSheet in templateWorkbookPart.Workbook.Sheets.Elements<Sheet>())
             {
-                var templateWorkbookPart = templateDoc.WorkbookPart;
-                var outputWorkbookPart = outputDoc.WorkbookPart;
+                var templateSheetPart = (WorksheetPart)templateWorkbookPart.GetPartById(templateSheet.Id);
+                var outputSheetPart = GetWorksheetPartByName(outputWorkbookPart, templateSheet.Name);
 
-                foreach (var templateSheet in templateWorkbookPart.Workbook.Sheets.Elements<Sheet>())
-                {
-                    var templateSheetPart = (WorksheetPart)templateWorkbookPart.GetPartById(templateSheet.Id);
-                    var outputSheetPart = GetWorksheetPartByName(outputWorkbookPart, templateSheet.Name);
-
-                    if (templateSheetPart.DrawingsPart == null) continue;
+                if (templateSheetPart.DrawingsPart == null) continue;
                     
-                    var templateDrawingPart = templateSheetPart.DrawingsPart;
-                    var outputDrawingPart = outputSheetPart.AddNewPart<DrawingsPart>();
-                    outputDrawingPart.FeedData(templateDrawingPart.GetStream());
+                var templateDrawingPart = templateSheetPart.DrawingsPart;
+                var outputDrawingPart = outputSheetPart.AddNewPart<DrawingsPart>();
+                outputDrawingPart.FeedData(templateDrawingPart.GetStream());
 
-                    foreach (var templateChartPart in templateDrawingPart.ChartParts)
+                foreach (var templateChartPart in templateDrawingPart.ChartParts)
+                {
+                    var outputChartPart = outputDrawingPart.AddNewPart<ChartPart>();
+                    outputChartPart.FeedData(templateChartPart.GetStream());
+
+                    foreach (var rel in templateChartPart.Parts)
                     {
-                        var outputChartPart = outputDrawingPart.AddNewPart<ChartPart>();
-                        outputChartPart.FeedData(templateChartPart.GetStream());
-
-                        foreach (var rel in templateChartPart.Parts)
-                        {
-                            outputChartPart.AddPart(rel.OpenXmlPart, rel.RelationshipId);
-                        }
+                        outputChartPart.AddPart(rel.OpenXmlPart, rel.RelationshipId);
                     }
-
-                    outputSheetPart.Worksheet.AppendChild(new Drawing { Id = outputSheetPart.GetIdOfPart(outputDrawingPart) });
-                    outputSheetPart.Worksheet.Save();
                 }
+
+                // 🔹 Kopiranje svih relacija ChartPart-a (ExternalData, Images, itd.)
+                foreach (var externalRel in templateDrawingPart.ExternalRelationships)
+                {
+                    outputDrawingPart.AddExternalRelationship(externalRel.RelationshipType, externalRel.Uri);
+                }
+
+                outputSheetPart.Worksheet.AppendChild(new Drawing { Id = outputSheetPart.GetIdOfPart(outputDrawingPart) });
+                outputSheetPart.Worksheet.Save();
             }
 
             outputStream.Position = 0;
