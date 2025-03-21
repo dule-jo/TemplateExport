@@ -30,6 +30,8 @@ namespace ExcelTemplateExport.Models
         
         internal bool AutoFitRows { get; set; }
         
+        internal bool CopyGraphs { get; set; }
+        
         public static Builder CreateBuilder() => new();
 
         public class Builder
@@ -200,6 +202,17 @@ namespace ExcelTemplateExport.Models
                 {
                     _config.DataSets.Add(dataSet.Key, dataSet.Value);
                 }
+                return this;
+            }
+
+            /// <summary>
+            /// Sets whether to copy graphs from the template to the output.
+            /// </summary>
+            /// <param name="copyGraphs"></param>
+            /// <returns></returns>
+            public Builder EnableCopyGraphs(bool copyGraphs = true)
+            {
+                _config.CopyGraphs = copyGraphs;
                 return this;
             }
         }

@@ -24,7 +24,8 @@ for (var i = 0; i < 3; i++)
     people.Add(new Person { Name = $"Person {i}", Age = 30 + i, Amount = 1000 + i });
 }
 
-ExportExcel(person, people, excelExport);
+// ExportExcel(person, people, excelExport);
+ExportExcelChart(excelExport);
 // ExportPdf(person, people, pdfExport);
 // ExportPdf2(person, people, pdfExport);
 
@@ -85,6 +86,25 @@ void ExportExcel(Person person, List<Person> list, ITemplateExportExcel template
         .EnablePreserveCellStyles(true)
         .AddDataSet("Person", person)
         .AddDataSet("Persons", list)
+        .Build();
+    
+    templateExportExcel.Export(config);
+    stopwatch.Stop();
+    
+    Console.WriteLine($"Elapsed time: {stopwatch.ElapsedMilliseconds} ms");
+}
+
+void ExportExcelChart(ITemplateExportExcel templateExportExcel)
+{
+    var stopwatch = new Stopwatch();
+    stopwatch.Start();
+    
+    var config = ExcelExportConfiguration.CreateBuilder()
+        .UseTemplatePath("/home/dulejo/Desktop/proba.xlsx")
+        .UseOutputPath("/home/dulejo/Desktop/output.xlsx")
+        .AddDataSet("aaa", 2)
+        .AddDataSet("bbb", 3)
+        .EnableCopyGraphs()
         .Build();
     
     templateExportExcel.Export(config);
