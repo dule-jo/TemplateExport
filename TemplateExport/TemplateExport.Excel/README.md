@@ -88,6 +88,23 @@ AddDataSet("Person", new Person { Name = "John", Age = 30 }) // add data set to 
 
 ```
 
+### 6. Charts
+
+TemplateExport.Excel supports charts. Just create template with chart referencing cells with placeholders.
+
+``` cssharp
+
+var config = ExcelExportConfiguration.CreateBuilder()
+        .UseTemplatePath("./Resources/chart.xlsx")
+        .UseOutputPath("./Resources/chartOutput.xlsx")
+        .AddDataSet("aaa", 2)
+        .AddDataSet("bbb", 3)
+        .EnableCopyGraphs()
+        .Build();
+templateExportExcel.Export(config);
+
+```
+
 ### Example
 
 Here is a complete example of exporting an Excel document:
