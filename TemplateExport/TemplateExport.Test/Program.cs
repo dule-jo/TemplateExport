@@ -100,8 +100,8 @@ void ExportExcelChart(ITemplateExportExcel templateExportExcel)
     stopwatch.Start();
     
     var config = ExcelExportConfiguration.CreateBuilder()
-        .UseTemplatePath("/home/dulejo/Desktop/proba.xlsx")
-        .UseOutputPath("/home/dulejo/Desktop/output.xlsx")
+        .UseTemplatePath("./Resources/chart.xlsx")
+        .UseOutputPath("./Resources/chartOutput.xlsx")
         .AddDataSet("aaa", 2)
         .AddDataSet("bbb", 3)
         .EnableCopyGraphs()

@@ -1,7 +1,5 @@
 using ClosedXML.Excel;
 using ClosedXML.Graphics;
-using DocumentFormat.OpenXml.Packaging;
-using DocumentFormat.OpenXml.Spreadsheet;
 using ExcelTemplateExport.Models;
 
 namespace ExcelTemplateExport.Internals
@@ -10,27 +8,18 @@ namespace ExcelTemplateExport.Internals
     {
         public void Export(ExcelExportConfiguration config)
         {
-            LoadOptions.DefaultGraphicEngine = new DefaultGraphicEngine("Arial");
+            LoadOptions.DefaultGraphicEngine = new DefaultGraphicEngine("DejaVu Sans");
 
             using var templateWb = new XLWorkbook(config.TemplatePath);
-            using var outputWb = new XLWorkbook();
+            using var outputWb = config.CopyGraphs ? GetWorkbookWithoutData(config) : new XLWorkbook();
 
             foreach (var worksheet in templateWb.Worksheets)
             {
-                var outputSheet = outputWb.AddWorksheet(worksheet.Name);
+                var outputSheet = outputWb.Worksheets.FirstOrDefault(x => x.Name == worksheet.Name);
+                
+                if (outputSheet == null) outputSheet = outputWb.Worksheets.Add(worksheet.Name);
 
                 new TemplateExportExcelWorksheet().Export(config, worksheet, outputSheet);
-            }
-
-            if (config.CopyGraphs)
-            {
-                var stream = CopyGraphs(templateWb, outputWb);
-                if (config.OutputStream != null) stream.CopyTo(config.OutputStream);
-                else if (!string.IsNullOrEmpty(config.OutputPath))
-                {
-                    using var fileStream = new FileStream(config.OutputPath, FileMode.Create, FileAccess.Write);
-                    stream.CopyTo(fileStream);
-                }
             }
 
             if (config.OutputStream != null)
@@ -39,60 +28,19 @@ namespace ExcelTemplateExport.Internals
             else throw new ArgumentNullException("OutputPath or OutputStream must be set");
         }
 
-        private MemoryStream CopyGraphs(XLWorkbook templateWb, XLWorkbook outputWb)
+        private static XLWorkbook GetWorkbookWithoutData(ExcelExportConfiguration config)
         {
-            using var templateStream = new MemoryStream();
-            var outputStream = new MemoryStream();
-            
-            templateWb.SaveAs(templateStream);
-            outputWb.SaveAs(outputStream);
+            var wb = new XLWorkbook(config.TemplatePath);
 
-            using var templateDoc = SpreadsheetDocument.Open(templateStream, false);
-            using var outputDoc = SpreadsheetDocument.Open(outputStream, true);
-            
-            var templateWorkbookPart = templateDoc.WorkbookPart;
-            var outputWorkbookPart = outputDoc.WorkbookPart;
-
-            foreach (var templateSheet in templateWorkbookPart.Workbook.Sheets.Elements<Sheet>())
+            foreach (var worksheet in wb.Worksheets)
             {
-                var templateSheetPart = (WorksheetPart)templateWorkbookPart.GetPartById(templateSheet.Id);
-                var outputSheetPart = GetWorksheetPartByName(outputWorkbookPart, templateSheet.Name);
-
-                if (templateSheetPart.DrawingsPart == null) continue;
-                    
-                var templateDrawingPart = templateSheetPart.DrawingsPart;
-                var outputDrawingPart = outputSheetPart.AddNewPart<DrawingsPart>();
-                outputDrawingPart.FeedData(templateDrawingPart.GetStream());
-
-                foreach (var templateChartPart in templateDrawingPart.ChartParts)
+                foreach (var cell in worksheet.RangeUsed().Cells())
                 {
-                    var outputChartPart = outputDrawingPart.AddNewPart<ChartPart>();
-                    outputChartPart.FeedData(templateChartPart.GetStream());
-
-                    foreach (var rel in templateChartPart.Parts)
-                    {
-                        outputChartPart.AddPart(rel.OpenXmlPart, rel.RelationshipId);
-                    }
+                    if (!cell.HasFormula) cell.Clear(XLClearOptions.Contents);
                 }
-
-                // 🔹 Kopiranje svih relacija ChartPart-a (ExternalData, Images, itd.)
-                foreach (var externalRel in templateDrawingPart.ExternalRelationships)
-                {
-                    outputDrawingPart.AddExternalRelationship(externalRel.RelationshipType, externalRel.Uri);
-                }
-
-                outputSheetPart.Worksheet.AppendChild(new Drawing { Id = outputSheetPart.GetIdOfPart(outputDrawingPart) });
-                outputSheetPart.Worksheet.Save();
             }
 
-            outputStream.Position = 0;
-            return outputStream;
-        }
-
-        private static WorksheetPart GetWorksheetPartByName(WorkbookPart workbookPart, string sheetName)
-        {
-            var sheet = workbookPart.Workbook.Sheets.Elements<Sheet>().FirstOrDefault(s => s.Name == sheetName);
-            return sheet != null ? (WorksheetPart)workbookPart.GetPartById(sheet.Id) : null;
+            return wb;
         }
     }
 }
