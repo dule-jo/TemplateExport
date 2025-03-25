@@ -10,8 +10,8 @@ internal static class ListUtility
 
         return fieldInfo.Aggregation switch
         {
-            FieldInfo.AggregationType.Sum => list.Sum(x => Convert.ToDouble(x.GetType().GetProperty(fieldInfo.PropertyName).GetValue(x))),
-            FieldInfo.AggregationType.Average => list.Average(x => Convert.ToDouble(x.GetType().GetProperty(fieldInfo.PropertyName).GetValue(x))),
+            FieldInfo.AggregationType.Sum => list.Sum(x => Convert.ToDouble(x.GetType()?.GetProperty(fieldInfo.PropertyName)?.GetValue(x) ?? 0)),
+            FieldInfo.AggregationType.Average => list.Where(x=>x.GetType()?.GetProperty(fieldInfo.PropertyName)?.GetValue(x) != null).Average(x => Convert.ToDouble(x.GetType()?.GetProperty(fieldInfo.PropertyName)?.GetValue(x) ?? 0)),
             FieldInfo.AggregationType.Count => list.Count(),
             _ => null
         };
